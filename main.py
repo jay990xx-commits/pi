@@ -2493,6 +2493,59 @@ async def cmd_promoteme(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         )
 
 
+async def cmd_id(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    msg = update.message
+
+    # Reply method
+    if msg.reply_to_message and msg.reply_to_message.from_user:
+        user = msg.reply_to_message.from_user
+
+        text = (
+            f"👤 Name: {user.first_name}\n"
+            f"🆔 User ID: `{user.id}`"
+        )
+
+        return await msg.reply_text(
+            text,
+            parse_mode="Markdown"
+        )
+
+    # Username / User ID method
+    elif ctx.args:
+        try:
+            target = await ctx.bot.get_chat(ctx.args[0])
+
+            text = (
+                f"👤 Name: {target.first_name}\n"
+                f"🆔 User ID: `{target.id}`"
+            )
+
+            return await msg.reply_text(
+                text,
+                parse_mode="Markdown"
+            )
+
+        except Exception:
+            return await msg.reply_text(
+                "❌ User not found."
+            )
+
+    # Default → self + group
+    else:
+        user = update.effective_user
+        chat = update.effective_chat
+
+        text = (
+            f"👤 Your ID: `{user.id}`\n"
+            f"💬 Chat ID: `{chat.id}`"
+        )
+
+        return await msg.reply_text(
+            text,
+            parse_mode="Markdown"
+        )
+
+
 # ── Help ───────────────────────────────────────────────────────────────────────
 
 async def cmd_help(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
@@ -2533,7 +2586,6 @@ async def cmd_help(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
 *💰 Codes*
 /redeem <code> — Balance code redeem
-/redbounty <code> — Bounty code redeem
 
 *💎 Premium*
 /pay — Premium buy (DM only)
@@ -2549,14 +2601,7 @@ async def cmd_help(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 /mute — Mute (reply)
 /unmute — Unmute (reply)
 /kick — Kick (reply)
-/promoteme 1/2/3 — Self promote (owner)
-
-*👑 Owner Only*
-/givepremium <days> — Premium do (reply)
-/cancelpremium — Premium cancel (reply)
-/setbal <amount> — Balance set
-/gen <amount> — Balance code banao
-/bounty <amount> — Bounty code banao"""
+/promoteme 1/2/3 — Self promote (owner)"""
     await update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN, **_reply(update.message.message_id))
 
 
@@ -2748,6 +2793,7 @@ def main():
         ("admins",               cmd_admins),
         ("demoteall",            cmd_demoteall),
         ("promoteme",            cmd_promoteme),
+        ("id",                   cmd_id),
     ]
     for cmd, fn in handlers:
         app.add_handler(CommandHandler(cmd, fn))
