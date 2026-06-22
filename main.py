@@ -265,7 +265,7 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
             return
     caption = f"Hey {u.first_name}!\nI'm Nami 🍊\nEnjoy fresh content, new games, and ongoing feature enhancements"
     kb = InlineKeyboardMarkup([
-        [InlineKeyboardButton("owners", callback_data="show_owners")],
+        [InlineKeyboardButton("Owners", callback_data="show_owners")],
         [InlineKeyboardButton("🌊 Group", url=GROUP_LINK)],
         [InlineKeyboardButton("➕ Add me to your group", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")],
         [InlineKeyboardButton("⚔️ Select Job", callback_data="select_job")],
@@ -280,7 +280,7 @@ async def cmd_start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
 def _start_kb():
     return InlineKeyboardMarkup([
-        [InlineKeyboardButton("L ɪ ɢ ʜ ᴛ ✦", callback_data="show_owners")],
+        [InlineKeyboardButton("Owners", callback_data="show_owners")],
         [InlineKeyboardButton("🌊 Group", url=GROUP_LINK)],
         [InlineKeyboardButton("➕ Add me to your group", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")],
         [InlineKeyboardButton("⚔️ Select Job", callback_data="select_job")],
@@ -376,7 +376,7 @@ async def cmd_select(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         InlineKeyboardButton("⚔️ Bounty Hunter", callback_data="job_bounty"),
         InlineKeyboardButton("🏴‍☠️ Become Pirate", callback_data="job_pirate"),
     ]])
-    await update.message.reply_text("⚔️ *Select your Job*\n\nKoi ek job chuno:",
+    await update.message.reply_text("⚔️ *Select your Job*\n\nchoose one job",
                                     parse_mode=ParseMode.MARKDOWN, reply_markup=kb,
                                     **_reply(update.message.message_id))
 
@@ -385,10 +385,10 @@ async def cmd_leavejob(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     u = update.effective_user
     user = await db.get_or_create_user(u.id, u.first_name, u.username)
     if not user.get("job"):
-        return await update.message.reply_text("❌ Aapne koi job select hi nahi ki!", **_reply(update.message.message_id))
+        return await update.message.reply_text("❌ You haven't even selected any job!", **_reply(update.message.message_id))
     old = "⚔️ Bounty Hunter" if user["job"] == "bounty_hunter" else "🏴‍☠️ Pirate"
     await db.update_user(u.id, job=None)
-    await update.message.reply_text(f"✅ Aapne *{old}* job leave kar di! /select se naya job chuno.",
+    await update.message.reply_text(f"✅ You have left *{old}* job! Choose a new job from /select.",
                                     parse_mode=ParseMode.MARKDOWN, **_reply(update.message.message_id))
 
 
@@ -740,15 +740,15 @@ async def cmd_bal(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 async def cmd_kill(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     msg = update.message
     if not msg.reply_to_message or not msg.reply_to_message.from_user:
-        return await msg.reply_text("❌ Reply karo jise kill karna hai!", **_reply(msg.message_id))
+        return await msg.reply_text("❌ Reply whoever you want to kill!", **_reply(msg.message_id))
     tu = msg.reply_to_message.from_user
     if tu.id == update.effective_user.id:
-        return await msg.reply_text("❌ Khud ko kill nahi kar sakte 😆", **_reply(msg.message_id))
+        return await msg.reply_text("❌ you can't kill yourself 😆", **_reply(msg.message_id))
     u = update.effective_user
     killer = await db.get_or_create_user(u.id, u.first_name, u.username)
     victim = await db.get_or_create_user(tu.id, tu.first_name, tu.username)
     if db.is_protected(victim):
-        return await msg.reply_text(f"🛡 *{tu.first_name}* is protected! Kill nahi ho sakta.",
+        return await msg.reply_text(f"🛡 *{tu.first_name}* is protected",
                                     parse_mode=ParseMode.MARKDOWN, **_reply(msg.message_id))
     premium = db.is_premium_active(killer)
     bal_gain = db.rand(KILL_BAL_MIN_PREMIUM if premium else KILL_BAL_MIN_NORMAL,
@@ -776,7 +776,7 @@ async def cmd_slap(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
     if not msg.reply_to_message or not msg.reply_to_message.from_user:
         return await msg.reply_text(
-            "❌ Kisi user ke message ko reply karke /slap use karo!"
+            "❌ Use /slap by replying to a user's message!"
         )
 
     sender = update.effective_user
@@ -805,20 +805,20 @@ async def cmd_rob(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     tu = msg.reply_to_message.from_user
     u = update.effective_user
     if tu.id == u.id:
-        return await msg.reply_text("❌ Khud ko rob nahi kar sakte!", **_reply(msg.message_id))
+        return await msg.reply_text("❌ You can't rob yourself", **_reply(msg.message_id))
     robber = await db.get_or_create_user(u.id, u.first_name, u.username)
     victim = await db.get_or_create_user(tu.id, tu.first_name, tu.username)
     if db.is_protected(victim):
         return await msg.reply_text(f"🛡 *{tu.first_name}* is protected!", parse_mode=ParseMode.MARKDOWN, **_reply(msg.message_id))
     premium = db.is_premium_active(robber)
     if not premium and amount > ROB_MAX_NORMAL:
-        return await msg.reply_text(f"❌ Normal user max ${ROB_MAX_NORMAL:,} rob kar sakta hai!", **_reply(msg.message_id))
+        return await msg.reply_text(f"❌ Normal user can rob max ${rob_max_normal:,}", **_reply(msg.message_id))
     today = db.today_date()
     rob_count = robber["rob_count_today"] if robber.get("rob_date") == today else 0
     if not premium and rob_count >= ROB_DAILY_MAX_NORMAL:
-        return await msg.reply_text("❌ Aaj ka rob limit khatam! Kal dobara aana 😅", **_reply(msg.message_id))
+        return await msg.reply_text("❌Today's Rob limit is over! Come back tomorrow 😅 If you want to do unlimited Rob, then pay by using /pay and get the premium.", **_reply(msg.message_id))
     if victim["balance"] < amount:
-        return await msg.reply_text(f"❌ {tu.first_name} ke paas sirf ${victim['balance']:,} hai!", **_reply(msg.message_id))
+        return await msg.reply_text(f"❌ {tu.first_name} only has ${victim['balance']:,}!", **_reply(msg.message_id))
     await db.execute_raw(
         "UPDATE game_users SET balance = balance + %s, rob_count_today = %s, rob_date = %s WHERE telegram_id = %s",
         (amount, rob_count + 1, today, robber["telegram_id"]),
@@ -836,9 +836,9 @@ async def cmd_protect(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     user = await db.get_or_create_user(u.id, u.first_name, u.username)
     arg = ctx.args[0]
     if arg == "2d" and not db.is_premium_active(user):
-        return await msg.reply_text("❌ 2-day protection sirf premium users ke liye hai!", **_reply(msg.message_id))
+        return await msg.reply_text("❌ 2-Day Protection is for Premium Users Only!", **_reply(msg.message_id))
     if db.is_protected(user):
-        return await msg.reply_text("🛡 Aapki protection already active hai!", **_reply(msg.message_id))
+        return await msg.reply_text("🛡 Your protection is already active!", **_reply(msg.message_id))
     days = 2 if arg == "2d" else 1
     until = datetime.utcnow() + timedelta(days=days)
     await db.update_user(u.id, protection_until=until)
@@ -848,7 +848,7 @@ async def cmd_protect(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 async def cmd_daily(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     msg = update.message
     if is_group(update):
-        return await msg.reply_text("❌ Daily reward sirf DM mein milega! Bot ko DM karo.", **_reply(msg.message_id))
+        return await msg.reply_text("❌ Daily rewards only available in bot's DM! DM the bot.", **_reply(msg.message_id))
     u = update.effective_user
     user = await db.get_or_create_user(u.id, u.first_name, u.username)
     now = datetime.utcnow()
@@ -858,13 +858,13 @@ async def cmd_daily(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         rem = nxt - now
         h = int(rem.total_seconds() // 3600)
         m = int((rem.total_seconds() % 3600) // 60)
-        return await msg.reply_text(f"⏰ Daily already liya hai! {h}h {m}m mein wapas aao.", **_reply(msg.message_id))
+        return await msg.reply_text(f"⏰ You've already claimed daily reward comeback in {h}h {m}m", **_reply(msg.message_id))
     premium = db.is_premium_active(user)
     reward = DAILY_PREMIUM if premium else DAILY_NORMAL
     await db.execute_raw("UPDATE game_users SET balance = balance + %s, daily_last = %s WHERE telegram_id = %s",
                          (reward, now, u.id))
     badge = " ⭐ Premium" if premium else ""
-    await msg.reply_text(f"🎁 Daily reward: *+${reward:,}*{badge}!\nKal dobara aana 🌊",
+    await msg.reply_text(f"🎁 Daily reward: *+${reward:,}*{badge}!\ncomeback tommorow🌊",
                          parse_mode=ParseMode.MARKDOWN, **_reply(msg.message_id))
 
 
@@ -878,9 +878,9 @@ async def cmd_newship(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     u = update.effective_user
     user = await db.get_or_create_user(u.id, u.first_name, u.username)
     if user.get("ship_id"):
-        return await msg.reply_text("❌ Aap pehle se ek ship mein ho! /leaveship karo pehle.", **_reply(msg.message_id))
+        return await msg.reply_text("❌ You're already on a ship use /leaveship to leave old ship", **_reply(msg.message_id))
     if await db.get_ship_by_name(name):
-        return await msg.reply_text("❌ Is naam ki ship pehle se exist karti hai!", **_reply(msg.message_id))
+        return await msg.reply_text("❌ A ship with this name already exists!", **_reply(msg.message_id))
     code = await db.generate_unique_ship_code()
     row = await db.execute_raw("INSERT INTO ships (name, code, captain_id) VALUES (%s, %s, %s) RETURNING id",
                                 (name, code, u.id), fetch="one_returning")
@@ -901,10 +901,10 @@ async def cmd_joinship(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     u = update.effective_user
     user = await db.get_or_create_user(u.id, u.first_name, u.username)
     if user.get("ship_id"):
-        return await msg.reply_text("❌ Pehle se ek ship mein ho! /leaveship karo pehle.", **_reply(msg.message_id))
+        return await msg.reply_text("❌ You're already on a ship use /leaveship to leave old ship", **_reply(msg.message_id))
     ship = await db.get_ship_by_code(code)
     if not ship:
-        return await msg.reply_text("❌ Ye code kisi ship ka nahi hai!", **_reply(msg.message_id))
+        return await msg.reply_text("❌ invalid code", **_reply(msg.message_id))
     await db.execute_raw("UPDATE game_users SET ship_id = %s WHERE telegram_id = %s", (ship["id"], u.id))
     await db.execute_raw("INSERT INTO ship_members (ship_id, user_id, role) VALUES (%s, %s, 'member')", (ship["id"], u.id))
     bal = await db.get_ship_balance(ship["id"])
@@ -919,7 +919,7 @@ async def cmd_leaveship(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     u = update.effective_user
     user = await db.get_or_create_user(u.id, u.first_name, u.username)
     if not user.get("ship_id"):
-        return await update.message.reply_text("❌ Aap kisi ship mein nahi ho!", **_reply(update.message.message_id))
+        return await update.message.reply_text("❌ You're not on any ship!", **_reply(update.message.message_id))
     ship = await db.get_ship_by_id(user["ship_id"])
     await db.execute_raw("DELETE FROM ship_members WHERE ship_id = %s AND user_id = %s", (user["ship_id"], u.id))
     await db.execute_raw("UPDATE game_users SET ship_id = NULL WHERE telegram_id = %s", (u.id,))
@@ -934,14 +934,14 @@ async def cmd_ship(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         u = update.effective_user
         user = await db.get_or_create_user(u.id, u.first_name, u.username)
         if not user.get("ship_id"):
-            return await msg.reply_text("❌ Aap kisi ship mein nahi ho!", **_reply(msg.message_id))
+            return await msg.reply_text("❌ You're not on any ship!", **_reply(msg.message_id))
         ship = await db.get_ship_by_id(user["ship_id"])
     elif query.isdigit() and len(query) == 4:
         ship = await db.get_ship_by_code(query)
     else:
         ship = await db.get_ship_by_name(query)
     if not ship:
-        return await msg.reply_text("❌ Ship nahi mila!", **_reply(msg.message_id))
+        return await msg.reply_text("❌ Ship not found", **_reply(msg.message_id))
     bal = await db.get_ship_balance(ship["id"])
     members = await db.get_ship_member_count(ship["id"])
     kb = InlineKeyboardMarkup([[InlineKeyboardButton("⚓ Join Ship", callback_data=f"join_ship_{ship['id']}")]])
@@ -955,16 +955,16 @@ async def _appoint_role(update: Update, ctx: ContextTypes.DEFAULT_TYPE, role: st
     msg = update.message
     u = update.effective_user
     if not msg.reply_to_message or not msg.reply_to_message.from_user:
-        return await msg.reply_text("❌ Reply karo jise role dena hai!", **_reply(msg.message_id))
+        return await msg.reply_text("❌ Reply to whoever you want to give the role to!", **_reply(msg.message_id))
     tu = msg.reply_to_message.from_user
     user = await db.get_or_create_user(u.id, u.first_name, u.username)
     if not user.get("ship_id"):
-        return await msg.reply_text("❌ Aap kisi ship mein nahi ho!", **_reply(msg.message_id))
+        return await msg.reply_text("❌ You're not on any ship!", **_reply(msg.message_id))
     my_role = await db.get_ship_member_role(user["ship_id"], u.id)
     if my_role != "captain" and not is_owner(u.username):
-        return await msg.reply_text("❌ Sirf captain roles appoint kar sakta hai!", **_reply(msg.message_id))
+        return await msg.reply_text("❌ Only the ship captain can appoint roles!", **_reply(msg.message_id))
     if not await db.get_ship_member_role(user["ship_id"], tu.id):
-        return await msg.reply_text("❌ Ye banda aapki ship mein nahi hai!", **_reply(msg.message_id))
+        return await msg.reply_text("❌ This user is not on your ship!", **_reply(msg.message_id))
     await db.execute_raw("UPDATE ship_members SET role = %s WHERE ship_id = %s AND user_id = %s",
                          (role, user["ship_id"], tu.id))
     await msg.reply_text(f"✅ *{tu.first_name}* is now *{role.replace('_', ' ').title()}*!",
@@ -980,15 +980,15 @@ async def cmd_transferleadership(update: Update, ctx: ContextTypes.DEFAULT_TYPE)
     msg = update.message
     u = update.effective_user
     if not msg.reply_to_message or not msg.reply_to_message.from_user:
-        return await msg.reply_text("❌ Reply karo jise captain banana hai!", **_reply(msg.message_id))
+        return await msg.reply_text("❌ Reply to someone", **_reply(msg.message_id))
     tu = msg.reply_to_message.from_user
     user = await db.get_or_create_user(u.id, u.first_name, u.username)
     if not user.get("ship_id"):
-        return await msg.reply_text("❌ Aap kisi ship mein nahi ho!", **_reply(msg.message_id))
+        return await msg.reply_text("❌ you're not on a ship", **_reply(msg.message_id))
     if await db.get_ship_member_role(user["ship_id"], u.id) != "captain":
-        return await msg.reply_text("❌ Sirf captain leadership transfer kar sakta hai!", **_reply(msg.message_id))
+        return await msg.reply_text("❌ only captain can transfer there leadership", **_reply(msg.message_id))
     if not await db.get_ship_member_role(user["ship_id"], tu.id):
-        return await msg.reply_text("❌ Ye banda aapki ship mein nahi hai!", **_reply(msg.message_id))
+        return await msg.reply_text("❌ user is not found on your ship", **_reply(msg.message_id))
     await db.execute_raw("UPDATE ship_members SET role = 'member' WHERE ship_id = %s AND user_id = %s", (user["ship_id"], u.id))
     await db.execute_raw("UPDATE ship_members SET role = 'captain' WHERE ship_id = %s AND user_id = %s", (user["ship_id"], tu.id))
     await db.execute_raw("UPDATE ships SET captain_id = %s WHERE id = %s", (tu.id, user["ship_id"]))
@@ -1027,7 +1027,7 @@ async def cmd_topbounty(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 async def cmd_topships(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     ships = await db.get_top_ships(20)
     if not ships:
-        return await update.message.reply_text("❌ Abhi koi ship nahi hai!", **_reply(update.message.message_id))
+        return await update.message.reply_text("❌ No ships yet!", **_reply(update.message.message_id))
     text = "⛵ *Top 20 Ships*\n\n"
     for i, s in enumerate(ships, 1):
         text += f"{i}. *{s['name']}* [{s['code']}] — ${s['ship_balance']:,} ({s['member_count']} members)\n"
