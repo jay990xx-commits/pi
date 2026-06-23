@@ -171,6 +171,7 @@ PROMOTE_RIGHTS = {
         can_invite_users=True,
         can_pin_messages=True,
         can_manage_video_chats=True,
+        can_edit_member_tags=True,
     ),
 
     3: dict(
@@ -181,6 +182,10 @@ PROMOTE_RIGHTS = {
         can_pin_messages=True,
         can_manage_video_chats=True,
         can_promote_members=True,
+        can_edit_member_tags=True,
+        can_post_stories=True,
+        can_edit_stories=True,
+        can_delete_stories=True,
     ),
 }
 PROMOTE_MSG = {1: "⭐ Level 1 Promoted", 2: "🌟 Level 2 Promoted", 3: "👑 Full Rights Promoted"}
