@@ -2791,7 +2791,7 @@ def main():
         ("unmute",               cmd_unmute),
         ("kick",                 cmd_kick),
         ("ban",                  cmd_ban),
-        ("unban",                cmd_unban),
+        ("unban",                cmd_unban), 
         ("delete",               cmd_delete),
         ("admins",               cmd_admins),
         ("demoteall",            cmd_demoteall),
